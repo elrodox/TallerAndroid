@@ -1,0 +1,1 @@
+- Se agrega patrón estado y se realizan avances en el patrón Facade
