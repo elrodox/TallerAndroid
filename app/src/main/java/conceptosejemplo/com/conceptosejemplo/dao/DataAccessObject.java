@@ -95,6 +95,22 @@ public class DataAccessObject {
         return cursorWhere;
     }
 
+    public Cursor getUser(String user, String password){
+        database = databaseAdmin.openDatabase();
+        Cursor cursor = database.rawQuery("SELECT * FROM user where username = '"+user+"' and password = '"+password+"' ", null);
+        //database.close();
+        return cursor;
+    }
+
+    public Cursor getAllRowsProducts(){
+        database = databaseAdmin.openDatabase();
+        Cursor cursor = database.rawQuery("SELECT * FROM productos", null);
+        //Cursor cursor2 = database.rawQuery("",null);
+        //database.close();
+        return cursor;
+    }
+
+
 
 
 }

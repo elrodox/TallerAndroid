@@ -5,6 +5,8 @@ package conceptosejemplo.com.conceptosejemplo.activities;
  */
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,7 +19,12 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import org.json.JSONException;
+
 import conceptosejemplo.com.conceptosejemplo.R;
+import conceptosejemplo.com.conceptosejemplo.dao.AssetDatabaseOpenHelper;
+import conceptosejemplo.com.conceptosejemplo.dao.DataAccessObject;
+import conceptosejemplo.com.conceptosejemplo.model.Products;
 
 import static conceptosejemplo.com.conceptosejemplo.R.layout.activity_login;
 
@@ -34,7 +41,33 @@ public class Login extends AppCompatActivity {
             public void onClick(View v) {
                 String usuario = ((EditText)findViewById(R.id.txtUser)).getText().toString();
                 String password = ((EditText)findViewById(R.id.txtPass)).getText().toString();
-                if (usuario.equals("admin")&& password.equals("1234")){
+
+                try {
+                    DataAccessObject.getDao(getApplicationContext());
+                    AssetDatabaseOpenHelper databaseAdmin = new AssetDatabaseOpenHelper(getApplicationContext());
+                    SQLiteDatabase database = databaseAdmin.openDatabase();
+
+                    Cursor cursor = DataAccessObject.getDao(getApplicationContext()).getUser(usuario, password);
+                    if (cursor.getCount()>0 ){
+                        cursor.moveToFirst();
+                        String tipo = cursor.getString(cursor.getColumnIndex("type"));
+                        if(tipo.equals("admin") ){
+                            Intent nuevoform = new Intent(Login.this,Admin.class);
+                            startActivity(nuevoform);
+                        }else {
+                            Intent nuevoform = new Intent(Login.this, MainActivity.class);
+                            startActivity(nuevoform);
+                        }
+                    }else {
+                        Toast.makeText(getApplicationContext(), "Usuario Incorrecto o Contraseña", Toast.LENGTH_SHORT).show();
+                    }
+                    database.close();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+               /* if (usuario.equals("admin")&& password.equals("1234")){
                     Intent nuevoform = new Intent(Login.this,Admin.class);
                     startActivity(nuevoform);
 
@@ -47,7 +80,7 @@ public class Login extends AppCompatActivity {
                     else{
                         Toast.makeText(getApplicationContext(),"Usuario Incorrecto o Contraseña",Toast.LENGTH_SHORT).show();
                     }
-                }
+                }*/
             }
         });
     }
